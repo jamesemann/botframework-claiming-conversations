@@ -1,36 +1,68 @@
 <!doctype html>
 <html>
-  <head>
+
+<head>
     <title>Socket.IO chat</title>
     <style>
       * { margin: 0; padding: 0; box-sizing: border-box; }
       body { font: 13px Helvetica, Arial; }
       form { background: #000; padding: 3px; position: fixed; bottom: 0; width: 100%; }
-      form input { border: 0; padding: 10px; width: 90%; margin-right: .5%; }
-      form button { width: 9%; background: rgb(130, 224, 255); border: none; padding: 10px; }
+      form input { border: 0; padding: 10px; width: 60%; margin-right: .5%; }
+      form button { width: 18%; background: rgb(130, 224, 255); border: none; padding: 10px; }
       #messages { list-style-type: none; margin: 0; padding: 0; }
       #messages li { padding: 5px 10px; }
       #messages li:nth-child(odd) { background: #eee; }
     </style>
-  </head>
-  <body>
-    <ul id="messages"></ul>
-    <form action="">
-      <input id="m" autocomplete="off" /><button>Send</button>
-    </form>
-  </body>
+</head>
 
-  <script src="/socket.io/socket.io.js"></script>
-<script src="https://code.jquery.com/jquery-1.11.1.js"></script>
+<body>
+    <ul id="messages" data-bind="foreach: messages">
+        <li>
+            <b data-bind="text: from"></b>
+            <span data-bind="text: messageText">
+            </span>
+        </li>
+    </ul>
+    <a href="#" data-bind="click: claim">Claim</a>
+    <a href="#" data-bind="click: relinquish">Relinquish</a>
+
+    <form data-bind="submit: sendMessage">
+        <input id="m" autocomplete="off" data-bind="value: message" /><button>Send</button>
+    </form>
+</body>
+
+<script src="/socket.io/socket.io.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.4.1/knockout-min.js"></script>
 <script>
-  var socket = io();
-  $('form').submit(function(){
-    socket.emit('chat message', $('#m').val());
-    $('#m').val('');
-    return false;
-  });
-  socket.on('chat message', function(msg){
-    $('#messages').append($('<li>').text(msg));
-  });
+
+    function ChatViewModel() {
+        var self = this;
+        self.socket = io();
+        self.message = ko.observable('');
+        self.messages = ko.observableArray([]);
+
+        self.claim = function () {
+            self.socket.emit('claim', {});
+            self.messages.push({ from: 'system', messageText: '**Claiming**' });
+        };
+
+        self.relinquish = function () {
+            self.socket.emit('relinquish', {});
+            self.messages.push({ from: 'system', messageText: '**Relinquishing**' });
+        };
+
+        self.sendMessage = function () {
+            self.socket.emit('chat message', { from: 'Me', messageText: self.message() });
+            self.message('');
+        };
+
+        self.socket.on('chat message', function (msg) {
+            self.messages.push(msg);
+        });
+    }
+
+    ko.applyBindings(new ChatViewModel());
+
 </script>
+
 </html>
