@@ -1,0 +1,17 @@
+{
+  "name": "socket",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "botbuilder": "^3.4.4",
+    "express": "^4.10.2",
+    "restify": "^4.3.0",
+    "socket.io": "^1.7.2"
+  }
+}
