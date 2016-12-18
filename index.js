@@ -74,7 +74,6 @@ io.on('connection', function (socket) {
     } else {
       console.log('dont have any participants to send to ');
     }
-
   });
 });
 
